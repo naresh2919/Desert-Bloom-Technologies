@@ -3,7 +3,11 @@ import os
 from datetime import datetime
 from urllib.parse import quote
 
-import gspread
+try:
+    import gspread
+except ImportError:  # pragma: no cover - optional dependency for Google Sheets
+    gspread = None
+
 from flask import Flask, jsonify, request, send_from_directory
 
 app = Flask(__name__)
@@ -30,6 +34,9 @@ def build_contact_row(data):
 
 
 def get_google_sheet_client():
+    if gspread is None:
+        return None
+
     sheet_id = os.getenv("GOOGLE_SHEET_ID")
     if not sheet_id:
         return None
@@ -94,7 +101,7 @@ def home():
 
 @app.get("/api/health")
 def health():
-    return jsonify({"status": "ok", "service": "Zenvyra Python API"})
+    return jsonify({"status": "ok", "service": "Desert Bloom Technologies API"})
 
 
 @app.post("/api/contact")
@@ -106,7 +113,7 @@ def create_contact_message():
 
     message = "\n".join(
         (
-            "Hello Zenvyra Technology,",
+            "Hello Desert Bloom Technologies,",
             "",
             "I'd like to discuss a project.",
             f"Name: {value(data, 'name', '')}",
